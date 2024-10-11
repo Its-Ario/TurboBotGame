@@ -383,7 +383,7 @@
         hash: userHash,
       };
 
-      const response = await fetch(`https://192.168.70.200:5000/save-score?hash=${userHash}`, {
+      const response = await fetch(`https://192.168.70.200:443/save-score?hash=${userHash}`, {
           method: 'POST',
           headers: {
               'Content-Type': 'application/json'
