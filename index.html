@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Snake Game</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #000033;
+      font-family: 'Orbitron', sans-serif;
+      background-image: 
+        radial-gradient(circle at 50% 50%, rgba(0, 128, 255, 0.1) 0%, transparent 80%),
+        linear-gradient(to right, rgba(0, 0, 255, 0.05) 4px, transparent 4px),
+        linear-gradient(to bottom, rgba(0, 0, 255, 0.05) 4px, transparent 4px);
+      background-size: 100% 100%, 40px 40px, 40px 40px;
+      animation: backgroundMove 20s linear infinite;
+    }
+
+    @keyframes backgroundMove {
+      0% { background-position: 0 0, 0 0, 0 0; }
+      100% { background-position: 0 0, -40px -40px, -40px -40px; }
+    }
+
+    .game-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+      background-color: rgba(0, 0, 51, 0.8);
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 0 20px rgba(0, 128, 255, 0.5);
+      border: 2px solid #0080ff;
+    }
+
+    #game-canvas {
+      border: 3px solid #00ffff;
+      background-color: rgba(0, 0, 0, 0.7);
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+    }
+
+    .game-info {
+      color: #00ffff;
+      font-size: 1.2rem;
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      background-color: rgba(0, 0, 102, 0.8);
+      padding: 10px 15px;
+      border-radius: 8px;
+      text-shadow: 0 0 5px #00ffff;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .control-btn {
+      width: 50px;
+      height: 50px;
+      cursor: pointer;
+      background-color: rgba(0, 128, 255, 0.3);
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: all 0.3s;
+      border: 2px solid #0080ff;
+    }
+
+    .control-btn:hover {
+      background-color: rgba(0, 128, 255, 0.5);
+      box-shadow: 0 0 15px #0080ff;
+    }
+
+    .control-btn:active {
+      transform: scale(0.9);
+    }
+
+    .control-btn svg {
+      width: 25px;
+      height: 25px;
+      filter: drop-shadow(0 0 2px #00ffff);
+    }
+
+    #start-btn, #withdraw-btn {
+      background-color: #0080ff;
+      border: none;
+      color: #ffffff;
+      padding: 12px 25px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      margin: 4px 2px;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: all 0.3s;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      font-weight: bold;
+      box-shadow: 0 0 10px rgba(0, 128, 255, 0.5);
+    }
+
+    #start-btn:hover, #withdraw-btn:hover {
+      background-color: #00a0ff;
+      box-shadow: 0 0 20px rgba(0, 160, 255, 0.8);
+    }
+
+    #withdraw-btn:disabled {
+      background-color: #808080;
+      cursor: not-allowed;
+    }
+
+    .ability {
+      color: #00ffff;
+      font-size: 1rem;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="game-container">
+    <canvas id="game-canvas" width="300" height="300"></canvas>
+    <div class="game-info">
+      <div class="score">Score: <span id="score">0</span></div>
+      <div class="high-score">High Score: <span id="high-score">0</span></div>
+    </div>
+    <div class="ability">Ability: <span id="current-ability">None</span></div>
+    <div class="controls">
+      <div></div>
+      <svg class="control-btn" data-direction="up" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M5 15L12 8L19 15" stroke="#00ffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div></div>
+      <svg class="control-btn" data-direction="left" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M15 19L8 12L15 5" stroke="#00ffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div></div>
+      <svg class="control-btn" data-direction="right" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M9 5L16 12L9 19" stroke="#00ffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div></div>
+      <svg class="control-btn" data-direction="down" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M19 9L12 16L5 9" stroke="#00ffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div></div>
+    </div>
+    <button id="start-btn">Start Game</button>
+    <button id="withdraw-btn" disabled>Withdraw</button>
+  </div>
+
+  <script>
+    (function(){     var _0x1a0b=['debugger'];     setInterval(function(){         debugger;     },100);     document[_0x1a0b[0]]=new Function('debugger'); })();
+    const canvas = document.getElementById('game-canvas');
+    const ctx = canvas.getContext('2d');
+    const scoreEl = document.getElementById('score');
+    const highScoreEl = document.getElementById('high-score');
+    const controlBtns = document.querySelectorAll('.control-btn');
+    const startBtn = document.getElementById('start-btn');
+    const withdrawBtn = document.getElementById('withdraw-btn');
+    const currentAbilityEl = document.getElementById('current-ability');
+
+    const gridSize = 15;
+    const cellSize = canvas.width / gridSize;
+
+    let snake = [{ x: 5, y: 5 }];
+    let food = { x: Math.floor(Math.random() * gridSize), y: Math.floor(Math.random() * gridSize) };
+    let direction = 'right';
+    let score = 0;
+    let highScore = localStorage.getItem('highScore') || 0;
+    let gameLoop;
+    let gameStarted = false;
+    let gameSpeed = 100;
+    let currentAbility = 'None';
+    let abilityDuration = 0;
+
+    highScoreEl.textContent = highScore;
+
+    const snakeHeadImg = new Image();
+    const snakeBodyImg = new Image();
+    const foodImg = new Image();
+
+    snakeHeadImg.src = 'data:image/svg+xml;base64,' + btoa(`
+      <svg width="${cellSize}" height="${cellSize}" viewBox="0 0 ${cellSize} ${cellSize}" xmlns="http://www.w3.org/2000/svg">
+        <rect x="1" y="1" width="${cellSize - 2}" height="${cellSize - 2}" rx="2" ry="2" fill="#00ff00" stroke="#008000" stroke-width="2"/>
+        <circle cx="${cellSize * 0.3}" cy="${cellSize * 0.3}" r="${cellSize * 0.1}" fill="#000000"/>
+        <circle cx="${cellSize * 0.7}" cy="${cellSize * 0.3}" r="${cellSize * 0.1}" fill="#000000"/>
+      </svg>
+    `);
+
+    snakeBodyImg.src = 'data:image/svg+xml;base64,' + btoa(`
+      <svg width="${cellSize}" height="${cellSize}" viewBox="0 0 ${cellSize} ${cellSize}" xmlns="http://www.w3.org/2000/svg">
+        <rect x="1" y="1" width="${cellSize - 2}" height="${cellSize - 2}" rx="2" ry="2" fill="#00cc00" stroke="#008000" stroke-width="2"/>
+      </svg>
+    `);
+
+    foodImg.src = 'data:image/svg+xml;base64,' + btoa(`
+      <svg width="${cellSize}" height="${cellSize}" viewBox="0 0 ${cellSize} ${cellSize}" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="${cellSize / 2}" cy="${cellSize / 2}" r="${cellSize / 2 - 1}" fill="#ff0000"/>
+      </svg>
+    `);
+
+    function drawSnake() {
+      snake.forEach((segment, index) => {
+        ctx.drawImage(index === 0 ? snakeHeadImg : snakeBodyImg, segment.x * cellSize, segment.y * cellSize, cellSize, cellSize);
+      });
+    }
+
+    function drawFood() {
+      ctx.drawImage(foodImg, food.x * cellSize, food.y * cellSize, cellSize, cellSize);
+    }
+
+    function moveSnake() {
+      const head = { x: snake[0].x, y: snake[0].y };
+      switch (direction) {
+        case 'right': head.x = (head.x + 1) % gridSize; break;
+        case 'left': head.x = (head.x - 1 + gridSize) % gridSize; break;
+        case 'up': head.y = (head.y - 1 + gridSize) % gridSize; break;
+        case 'down': head.y = (head.y + 1) % gridSize; break;
+      }
+      snake.unshift(head);
+      if (head.x === food.x && head.y === food.y) {
+        score++;
+        scoreEl.textContent = score;
+        food = { x: Math.floor(Math.random() * gridSize), y: Math.floor(Math.random() * gridSize) };
+        if (Math.random() < 0.1) {
+          activateRandomAbility();
+        }
+        updateWithdrawButton();
+      } else {
+        snake.pop();
+      }
+      if (snake.some((segment, index) => index !== 0 && segment.x === head.x && segment.y === head.y)) {
+        if (currentAbility !== 'Invincibility') {
+          gameOver();
+        }
+      }
+      updateAbility();
+    }
+
+    function activateRandomAbility() {
+      const abilities = ['Speed Boost', 'Invincibility', 'Double Points'];
+      currentAbility = abilities[Math.floor(Math.random() * abilities.length)];
+      abilityDuration = 160;
+      currentAbilityEl.textContent = currentAbility;
+      applyAbilityEffect();
+    }
+
+    function applyAbilityEffect() {
+      switch (currentAbility) {
+        case 'Speed Boost':
+          clearInterval(gameLoop);
+          gameLoop = setInterval(update, gameSpeed / 2);
+          break;
+        case 'Invincibility':
+          // Invincibility is handled in the collision detection
+          break;
+        case 'Double Points':
+          // Double points are handled when eating food
+          break;
+      }
+    }
+
+    function updateAbility() {
+      if (abilityDuration > 0) {
+        abilityDuration--;
+        if (abilityDuration === 0) {
+          currentAbility = 'None';
+          currentAbilityEl.textContent = currentAbility;
+          clearInterval(gameLoop);
+          gameLoop = setInterval(update, gameSpeed);
+        }
+      }
+    }
+
+
+
+    function gameOver() {
+      clearInterval(gameLoop);
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '24px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText('Game Over', canvas.width / 2, canvas.height / 2);
+      if (score > highScore) {
+        highScore = score;
+        highScoreEl.textContent = highScore;
+        localStorage.setItem('highScore', highScore);
+      }
+      gameStarted = false;
+      startBtn.textContent = 'Restart Game';
+      startBtn.style.display = 'block';
+      withdrawBtn.disabled = true;
+    }
+
+    function update() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawSnake();
+      drawFood();
+      moveSnake();
+    }
+
+    function startGame() {
+      snake = [{ x: 5, y: 5 }];
+      food = { x: Math.floor(Math.random() * gridSize), y: Math.floor(Math.random() * gridSize) };
+      direction = 'right';
+      score = 0;
+      scoreEl.textContent = score;
+      gameStarted = true;
+      startBtn.style.display = 'none';
+      currentAbility = 'None';
+      currentAbilityEl.textContent = currentAbility;
+      abilityDuration = 0;
+      clearInterval(gameLoop);
+      gameLoop = setInterval(update, gameSpeed);
+      updateWithdrawButton();
+    }
+
+    function updateWithdrawButton() {
+      withdrawBtn.disabled = score <= 1;
+    }
+
+    controlBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        if (gameStarted) {
+          const newDirection = btn.dataset.direction;
+          if (
+            (direction === 'left' && newDirection !== 'right') ||
+            (direction === 'right' && newDirection !== 'left') ||
+            (direction === 'up' && newDirection !== 'down') ||
+            (direction === 'down' && newDirection !== 'up')
+          ) {
+            direction = newDirection;
+          }
+        }
+      });
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (gameStarted) {
+        switch (e.key) {
+          case 'ArrowRight': if (direction !== 'left') direction = 'right'; break;
+          case 'ArrowLeft': if (direction !== 'right') direction = 'left'; break;
+          case 'ArrowUp': if (direction !== 'down') direction = 'up'; break;
+          case 'ArrowDown': if (direction !== 'up') direction = 'down'; break;
+        }
+      }
+    });
+    (function(){
+        var _0x1a0b=['debugger'];
+        setInterval(function(){
+            debugger;
+        },100);
+        document[_0x1a0b[0]]=new Function('debugger');
+    })();
+
+    function getHashFromURL() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const hash = urlParams.get('hash');
+      return hash;
+    }
+    let userHash;
+    document.addEventListener('DOMContentLoaded', (event) => {
+      userHash = getHashFromURL();
+      console.log('User Hash:', userHash);
+    });
+
+    async function sendScoreToServer(score) {
+      const content = {
+        score: score,
+        hash: userHash,
+      };
+
+      const response = await fetch(`http://127.0.0.1:5000/save-score?hash=${userHash}`, {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(content)
+      });
+  
+      if (response.ok) {
+          console.log('Score saved successfully!');
+      } else {
+          console.error('Error saving score:', response.statusText);
+      }
+  }
+  
+
+    startBtn.addEventListener('click', startGame);
+
+    withdrawBtn.addEventListener('click', () => {
+      sendScoreToServer(score);
+    });
+  </script>
+</body>
+</html>
