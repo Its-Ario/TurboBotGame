@@ -24,7 +24,8 @@ async def save_score():
 
     user_scores[user_hash] = score
     
-    response = {"ok": True, "hash": user_hash, "score": score}
+    response = {"hash": user_hash, "score": score}
+    logger.debug(response)
 
     return jsonify(data)
 
