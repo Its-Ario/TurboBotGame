@@ -392,12 +392,15 @@
       });
   
       if (response.ok) {
+          window.alert("Score Saved!");
           console.log('Score saved successfully!');
+          score = 0;
+          scoreEl.textContent = score;
       } else {
+          window.alert("Error Saving Score!")
           console.error('Error saving score:', response.statusText);
       }
   }
-  
 
     startBtn.addEventListener('click', startGame);
 
