@@ -29,9 +29,9 @@ async def get_score():
 
     if user_hash in user_scores:
         score = user_scores[user_hash]
-        return jsonify({"hash": user_hash, "score": score})
+        return jsonify({"ok":True, "hash": user_hash, "score": score})
     else:
-        return jsonify({"error": "User hash not found"}), 404
+        return jsonify({"ok": False, "error": "User hash not found"}), 404
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port='443')
