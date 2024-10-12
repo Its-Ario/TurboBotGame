@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <title>Snake Game</title>
   <style>
     body {
@@ -372,43 +373,31 @@
       return hash;
     }
     let userHash;
-    document.addEventListener('DOMContentLoaded', (event) => {
+    document.addEventListener('DOMContentLoaded', (evsent) => {
       userHash = getHashFromURL();
       console.log('User Hash:', userHash);
     });
 
-    async function sendScoreToServer(score) {
-      const content = {
-        score: score,
-        hash: userHash,
-      };
-
-      const response = await fetch(`http://192.168.70.200:443/save-score?hash=${userHash}`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*', // Allow requests from any origin
-        },
-        body: JSON.stringify(content),
-        mode: 'no-cors' // Disable CORS policy
-    });
-    
-  
-      if (response.ok) {
-          window.alert("Score Saved!");
-          console.log('Score saved successfully!');
-          score = 0;
-          scoreEl.textContent = score;
-      } else {
-          window.alert("Error Saving Score!")
-          console.error('Error saving score:', response.statusText);
-      }
-  }
+    function sendData(score, userHash) {
+      $.ajax({
+          url: '/save-score',
+          type: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify({ 'userHash': userHash, 'score': score }),
+          success: function(response) {
+              window.alert("Score Saved!")
+          },
+          error: function(error) {
+              window.alert("Error Saving Score!")
+              console.log(error);
+          }
+      });
+    }
 
     startBtn.addEventListener('click', startGame);
 
     withdrawBtn.addEventListener('click', () => {
-      sendScoreToServer(score);
+      sendData(score, userHash);
     });
   </script>
 </body>
