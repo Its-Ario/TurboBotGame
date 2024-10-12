@@ -385,11 +385,11 @@
           contentType: 'application/json',
           data: JSON.stringify({ 'userHash': userHash, 'score': score }),
           success: function(response) {
-              window.alert("Score Saved!")
+              window.alert("Score Saved!");
               return true;
           },
           error: function(error) {
-              window.alert("Error Saving Score!")
+              window.alert("Error Saving Score!");
               console.log(error);
               return false;
           }
