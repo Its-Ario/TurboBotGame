@@ -386,10 +386,12 @@
           data: JSON.stringify({ 'userHash': userHash, 'score': score }),
           success: function(response) {
               window.alert("Score Saved!")
+              return true;
           },
           error: function(error) {
               window.alert("Error Saving Score!")
               console.log(error);
+              return false;
           }
       });
     }
@@ -397,7 +399,11 @@
     startBtn.addEventListener('click', startGame);
 
     withdrawBtn.addEventListener('click', () => {
-      sendData(score, userHash);
+      var txt;
+      if (confirm("This Will End Your Game, Are You Sure?")) {
+        if(sendData(score, userHash)) {
+          gameOver();
+        }
     });
   </script>
 </body>
