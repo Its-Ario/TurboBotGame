@@ -1,6 +1,11 @@
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 from asgiref.wsgi import WsgiToAsgi
+from logging_config import setup_logging
+import logging
+
+setup_logging()
+logger = logging.getLogger(__name__)
 
 app = Flask(__name__, template_folder="templates")
 CORS(app)
@@ -20,7 +25,6 @@ async def save_score():
     user_scores[user_hash] = score
     
     response = {"ok": True, "hash": user_hash, "score": score}
-    print(response)
 
     return jsonify(data)
 
@@ -30,6 +34,7 @@ async def get_score():
 
     if user_hash in user_scores:
         score = user_scores[user_hash]
+        del user_scores[user_hash]
         return jsonify({"ok":True, "hash": user_hash, "score": score})
     else:
         return jsonify({"ok": False, "error": "User hash not found"}), 404
