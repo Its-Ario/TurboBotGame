@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
+from asgiref.wsgi import WsgiToAsgi
 
 app = Flask(__name__, template_folder="templates")
 CORS(app)
@@ -33,5 +34,4 @@ async def get_score():
     else:
         return jsonify({"ok": False, "error": "User hash not found"}), 404
 
-if __name__ == "__main__":
-    app.run(host='0.0.0.0', port='443')
+asgi_app = WsgiToAsgi(app)
