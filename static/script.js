@@ -209,37 +209,43 @@ return hash;
 
 let userHash;
 document.addEventListener('DOMContentLoaded', (event) => {
-userHash = getHashFromURL();
-console.log('User Hash:', userHash);
+  userHash = getHashFromURL();
+  console.log('User Hash:', userHash);
 });
 
 function sendData(score, userHash) {
   if (score < 2) {
-    alert("You Should Atleast Have 2 Score!")
+    alert("You should have at least 2 points!");
+    return;
   }
+
   $.ajax({
-      url: '/save-score',
-      type: 'POST',
-      contentType: 'application/json',
-      data: JSON.stringify({ score: score, hash: userHash }),
-      success: (response) => {
-          console.log('Score sent:', response);
-      },
-      error: (error) => {
-          console.error('Error sending score:', error);
-      }
+    url: '/save-score',
+    type: 'POST',
+    contentType: 'application/json',
+    data: JSON.stringify({ score: score, hash: userHash }),
+    success: () => {
+      console.log('Score sent');
+      alert('Score withdrawn: ' + score);
+
+      score = 0;
+      scoreEl.textContent = score;
+      startBtn.style.display = 'block';
+      gameStarted = false;
+      clearInterval(gameLoop);
+    },
+    error: (error) => {
+      alert("Error saving score");
+      console.error('Error sending score:', error);
+    }
   });
 }
 
 withdrawBtn.addEventListener('click', () => {
-  if (confirm("This Will End Your Game, Are You Sure?")) {
+  if (confirm("This will end your game. Are you sure?")) {
     sendData(score, userHash);
-    
-    alert('Score withdrawn: ' + score);
-    startBtn.style.display = 'block';
-    gameStarted = false;
-    clearInterval(gameLoop);
   }
 });
+
 
 startBtn.addEventListener('click', startGame)
