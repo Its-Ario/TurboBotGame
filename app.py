@@ -20,7 +20,7 @@ def main():
 async def save_score():
     data = request.get_json()
     score = data.get('score')
-    user_hash = data.get("userHash")
+    user_hash = data.get("hash")
 
     user_scores[user_hash] = score
     
