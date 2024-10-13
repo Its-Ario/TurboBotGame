@@ -30,6 +30,7 @@ let currentAbility = 'None';
 let abilityDuration = 0;
 
 highScoreEl.textContent = highScore;
+withdrawBtn.disabled = true;
 
 const snakeHeadImg = new Image();
 const snakeBodyImg = new Image();
@@ -62,7 +63,7 @@ snake.forEach((segment, index) => {
 }
 
 function drawFood() {
-ctx.drawImage(foodImg, food.x * cellSize, food.y * cellSize, cellSize, cellSize);
+  ctx.drawImage(foodImg, food.x * cellSize, food.y * cellSize, cellSize, cellSize);
 }
 
 function moveSnake() {
@@ -129,45 +130,44 @@ if (abilityDuration > 0) {
 }
 
 function gameOver() {
-clearInterval(gameLoop);
-ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
-ctx.fillRect(0, 0, canvas.width, canvas.height);
-ctx.fillStyle = '#ffffff';
-ctx.font = '24px Arial';
-ctx.textAlign = 'center';
-ctx.fillText('Game Over', canvas.width / 2, canvas.height / 2);
-if (score > highScore) {
-  highScore = score;
-  highScoreEl.textContent = highScore;
-  localStorage.setItem('highScore', highScore);
-}
-gameStarted = false;
-startBtn.textContent = 'Restart Game';
-startBtn.style.display = 'block';
-withdrawBtn.disabled = true;
+  clearInterval(gameLoop);
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '24px Arial';
+  ctx.textAlign = 'center';
+  ctx.fillText('Game Over', canvas.width / 2, canvas.height / 2);
+  if (score > highScore) {
+    highScore = score;
+    highScoreEl.textContent = highScore;
+    localStorage.setItem('highScore', highScore);
+  }
+  gameStarted = false;
+  startBtn.textContent = 'Restart Game';
+  startBtn.style.display = 'block';
 }
 
 function update() {
-ctx.clearRect(0, 0, canvas.width, canvas.height);
-drawSnake();
-drawFood();
-moveSnake();
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  drawSnake();
+  drawFood();
+  moveSnake();
 }
 
 function startGame() {
-snake = [{ x: 5, y: 5 }];
-food = { x: Math.floor(Math.random() * gridSize), y: Math.floor(Math.random() * gridSize) };
-direction = 'right';
-score = 0;
-scoreEl.textContent = score;
-gameStarted = true;
-startBtn.style.display = 'none';
-currentAbility = 'None';
-currentAbilityEl.textContent = currentAbility;
-abilityDuration = 0;
-clearInterval(gameLoop);
-gameLoop = setInterval(update, gameSpeed);
-updateWithdrawButton();
+  snake = [{ x: 5, y: 5 }];
+  food = { x: Math.floor(Math.random() * gridSize), y: Math.floor(Math.random() * gridSize) };
+  direction = 'right';
+  score = 0;
+  scoreEl.textContent = score;
+  gameStarted = true;
+  startBtn.style.display = 'none';
+  currentAbility = 'None';
+  currentAbilityEl.textContent = currentAbility;
+  abilityDuration = 0;
+  clearInterval(gameLoop);
+  gameLoop = setInterval(update, gameSpeed);
+  updateWithdrawButton();
 }
 
 function updateWithdrawButton() {
@@ -214,18 +214,21 @@ console.log('User Hash:', userHash);
 });
 
 function sendData(score, userHash) {
-$.ajax({
-    url: '/save-score',
-    type: 'POST',
-    contentType: 'application/json',
-    data: JSON.stringify({ score: score, hash: userHash }),
-    success: (response) => {
-        console.log('Score sent:', response);
-    },
-    error: (error) => {
-        console.error('Error sending score:', error);
-    }
-});
+  if (score < 2) {
+    alert("You Should Atleast Have 2 Score!")
+  }
+  $.ajax({
+      url: '/save-score',
+      type: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify({ score: score, hash: userHash }),
+      success: (response) => {
+          console.log('Score sent:', response);
+      },
+      error: (error) => {
+          console.error('Error sending score:', error);
+      }
+  });
 }
 
 withdrawBtn.addEventListener('click', () => {
@@ -234,7 +237,6 @@ withdrawBtn.addEventListener('click', () => {
     
     alert('Score withdrawn: ' + score);
     startBtn.style.display = 'block';
-    withdrawBtn.disabled = true;
     gameStarted = false;
     clearInterval(gameLoop);
   }
