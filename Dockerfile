@@ -10,4 +10,4 @@ COPY . .
 
 EXPOSE 5000
 
-CMD ["python", "main.py"]
+CMD ["hypercorn", "app:asgi_app", "-b", "0.0.0.0:5000"] 
