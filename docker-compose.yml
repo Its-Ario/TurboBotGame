@@ -1,0 +1,11 @@
+services:
+  turbo-bot-game:
+    image: turbo-bot-game:latest
+    container_name: turbo-bot-game
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python main.py
+    ports:
+      - "5000:5000"
+
