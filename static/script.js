@@ -213,8 +213,8 @@ document.addEventListener('DOMContentLoaded', (event) => {
   console.log('User Hash:', userHash);
 });
 
-function sendData(score, userHash) {
-  if (score < 2) {
+function sendData(userScore, userHash) {
+  if (userScore < 2) {
     alert("You should have at least 2 points!");
     return;
   }
@@ -223,10 +223,10 @@ function sendData(score, userHash) {
     url: '/save-score',
     type: 'POST',
     contentType: 'application/json',
-    data: JSON.stringify({ score: score, hash: userHash }),
+    data: JSON.stringify({ score: userScore, hash: userHash }),
     success: () => {
       console.log('Score sent');
-      alert('Score withdrawn: ' + score);
+      alert('Score withdrawn: ' + userScore);
 
       score = 0;
       scoreEl.textContent = score;
